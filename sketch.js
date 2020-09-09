@@ -5,6 +5,7 @@ var obtacleGroup, obstacleImage;
 var back, back1;
 var score;
 var ground;
+gameState = 0;
 
 function preload(){
   backImage= loadImage("back.png");
@@ -18,21 +19,19 @@ function preload(){
 function setup() {
   createCanvas(displayWidth,500);
   
-  back= createSprite(200,160,800,10);
+  back= createSprite(200,160,displayWidth,10);
   back.addImage("background", backImage);
   back.scale= 1.5
   //back.velocityX= -4;
   //back.x= back.width/2;
-  camera.position.x= monkey.x
 
-  back1= createSprite(340,160,800,10);
+  back1= createSprite(300,160,displayWidth,10);
   back1.addImage("background", backImage);
   back1.scale= 1.5
   //back1.velocityX= -4;
   //back1.x= back.width/2;
-  camera.position.x= monkey.x
-  
-  monkey= createSprite(50,265,20,50);
+
+  monkey= createSprite(10,265,20,50);
   monkey.addAnimation("monkey", monkeyImage);
   monkey.scale= 0.1;
   monkey.velocityX= 3
@@ -54,8 +53,13 @@ function draw(){
   if (back.x<0) {
     back.x= back.width/2
   }
-  
-  if (monkey.isTouching(bananaGroup)) {
+
+  if (back1.x<0) {
+    back1.x= back1.width/2
+  }
+
+  if (gameState===0) {
+    if (monkey.isTouching(bananaGroup)) {
       score= score+2
       bananaGroup.destroyEach();
       }
@@ -74,6 +78,10 @@ function draw(){
   
   monkey.collide(ground);
   
+  camera.position.x= monkey.x
+
+
+
   ground.setCollider("rectangle",0,0,10000,550)
   ground.visible= false;
   //ground.debug= true;
@@ -86,7 +94,7 @@ function draw(){
     monkey.velocityY= -15;
   }
   
- console.log(monkey.y)
+ console.log(monkey.x)
   
     monkey.velocityY= monkey.velocityY+0.8
   
@@ -96,18 +104,28 @@ function draw(){
   
 obstacleGroup.depth= back.depth
 obstacleGroup.depth= obstacleGroup.depth+1
-  
-  stroke("white");
-  textSize(20);
-  fill("white");
-  text("Score= "+ score, 500, 50);
+
+obstacleGroup.depth= back1.depth
+obstacleGroup.depth= obstacleGroup.depth+1
+
+stroke("white");
+textSize(20);
+fill("white");
+text("Score= "+ score, 800, 50);
+  }
+
+if (monkey.x>1320) {
+  gameState = 1
+  textSize(100)
+  text("Game Over", displayWidth/2, 250)
+}
 }
 
   function banana() {
     //when frame count is 90, bananas should appear
-    if (frameCount%90===0) {
+    if (frameCount%100===0) {
       //create the banana sprit and set its animation and scale
-      var banana= createSprite(400,340,20,20);
+      var banana= createSprite(displayWidth,340,20,20);
       banana.addImage(bananaImage);
       banana.scale= 0.05;
       //bananas should be visible
@@ -118,16 +136,16 @@ obstacleGroup.depth= obstacleGroup.depth+1
       //add the banana's velocity and increase the speed at every 100 points
       banana.velocityX= - (4 + 2*score/100);
       //add the lifetime to stop memory leak
-      banana.lifetime= 110;
+      banana.lifetime= 400;
       //add all the bananas to a group
       bananaGroup.add(banana);
     }
   }
   
   function obstacles() {
-    if (frameCount%300===0) {
+    if (frameCount%130===0) {
       //when frame count is 90, obstacles should appear
-      var obstacle= createSprite(400,350,20,20);
+      var obstacle= createSprite(displayWidth,350,20,20);
       //set the obstacle's animation and size
       obstacle.addImage(obstacleImage);
       obstacle.scale= 0.1;
@@ -139,7 +157,7 @@ obstacleGroup.depth= obstacleGroup.depth+1
       //add the obstacle's velocity and increase the speed at every 100 points
       obstacle.velocityX= - (4 + score/100);
       //add the lifetime to stop memory leak
-      obstacle.lifetime= 110;
+      obstacle.lifetime= 400;
       //add all the obstacles to a group
       obstacleGroup.add(obstacle);
     }
